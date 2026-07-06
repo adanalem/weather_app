@@ -61,8 +61,24 @@ else {
 }
 
 
-        videoElement.load();
-        videoElement.play();
+if (videoElement) {
+    // 1. Pehle chalne wali request ko pause karein
+    videoElement.pause(); 
+    
+    // 2. Nayi video stream load karein
+    videoElement.load();  
+    
+    // 3. BEST FIX: Jab tak pehla frame ready na ho, tab tak play na karein
+    videoElement.onloadeddata = async () => {
+        try {
+            await videoElement.play();
+        } catch (error) {
+            // Agar baar-baar request se interrupt ho bhi jaye, toh app crash nahi hogi
+            console.log("Playback interruption handled safely:", error.message);
+        }
+    };
+}
+
 
     } catch (error) {
         alert("City not found. Please enter a valid city name.");
